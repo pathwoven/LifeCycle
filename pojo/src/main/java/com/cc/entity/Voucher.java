@@ -64,6 +64,16 @@ public class Voucher implements Serializable {
      * 优惠券类型
      */
     private Integer status;
+
+    /**
+     * 生效时间
+     */
+    private LocalDateTime beginTime;
+
+    /**
+     * 失效时间
+     */
+    private LocalDateTime endTime;
     /**
      * 创建时间
      */

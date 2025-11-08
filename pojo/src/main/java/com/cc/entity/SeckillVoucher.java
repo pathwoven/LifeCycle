@@ -30,19 +30,20 @@ public class SeckillVoucher implements Serializable {
     private Integer stock;
 
     /**
+     * 开始抢购时间
+     */
+    private LocalDateTime beginKillTime;
+
+    /**
+     * 结束抢购时间
+     */
+    private LocalDateTime endKillTime;
+
+
+    /**
      * 创建时间
      */
     private LocalDateTime createTime;
-
-    /**
-     * 生效时间
-     */
-    private LocalDateTime beginTime;
-
-    /**
-     * 失效时间
-     */
-    private LocalDateTime endTime;
 
     /**
      * 更新时间

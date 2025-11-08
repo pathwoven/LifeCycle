@@ -19,4 +19,6 @@ public class VoucherAddSeckillDTO {
     private Integer stock;
     private LocalDateTime beginTime;
     private LocalDateTime endTime;
+    private LocalDateTime beginKillTime;
+    private LocalDateTime endKillTime;
 }

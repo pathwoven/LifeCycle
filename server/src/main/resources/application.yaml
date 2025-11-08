@@ -20,6 +20,8 @@ spring:
         time-between-eviction-runs: 10s
   jackson:
     default-property-inclusion: non_null # JSON处理时忽略非空字段
+
+
 mybatis-plus:
   type-aliases-package: com.cc.entity # 别名扫描包
 jwt:
@@ -28,3 +30,9 @@ jwt:
 logging:
   level:
     com.cc: debug
+
+rocketmq:
+  name-server: localhost:9876
+  producer:
+    group: seckill-producer-group
+    send-message-timeout: 3000

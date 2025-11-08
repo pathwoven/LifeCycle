@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.cc.mapper.SeckillVoucherMapper">
+    <select id="querySeckillVoucherForCacheToday" resultType="com.cc.dto.SeckillVoucherCacheDTO">
+        select voucher_id, stock, begin_kill_time, end_kill_time from tb_seckill_voucher where voucher_id in
+            <foreach collection="voucherIdList" item="voucherId" separator="," open="(" close=")">
+                #{voucherId}
+            </foreach>
+    </select>
 
 </mapper>
