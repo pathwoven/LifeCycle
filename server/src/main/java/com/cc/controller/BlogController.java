@@ -10,6 +10,7 @@ import com.cc.service.IBlogService;
 import com.cc.service.IUserService;
 import com.cc.constant.SystemConstants;
 import com.cc.utils.UserHolder;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -17,6 +18,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/blog")
+@Slf4j
 public class BlogController {
 
     @Resource
@@ -47,12 +49,14 @@ public class BlogController {
 
     @GetMapping("/of/me")
     public Result queryMyBlog(@RequestParam(value = "current", defaultValue = "1") Integer current) {
-        // 根据用户查询
-        Page<Blog> page = blogService.query()
-                .eq("user_id", UserHolder.getUserId()).page(new Page<>(current, SystemConstants.MAX_PAGE_SIZE));
-        // 获取当前页数据
-        List<Blog> records = page.getRecords();
-        return Result.ok(records);
+        log.info("debug:收到请求");
+        return Result.fail("功能未实现");
+//        // 根据用户查询
+//        Page<Blog> page = blogService.query()
+//                .eq("user_id", UserHolder.getUserId()).page(new Page<>(current, SystemConstants.MAX_PAGE_SIZE));
+//        // 获取当前页数据
+//        List<Blog> records = page.getRecords();
+//        return Result.ok(records);
     }
 
     @GetMapping("/hot")

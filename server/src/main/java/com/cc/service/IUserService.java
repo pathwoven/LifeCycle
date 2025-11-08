@@ -1,10 +1,12 @@
 package com.cc.service;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.cc.dto.UserRegisterDto;
 import com.cc.entity.User;
-import com.cc.vo.UserLoginVO;
 
-public interface IUserService{
+public interface IUserService extends IService<User> {
     User loginByPhone(String phone);
-    User getById(Long id);
+
+    boolean register(UserRegisterDto userRegisterDto);
 }

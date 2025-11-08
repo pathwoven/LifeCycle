@@ -25,7 +25,10 @@ public class JwtInterceptor implements HandlerInterceptor {
         if(!(handler instanceof HandlerMethod)) return true;
 
         String token = request.getHeader("Authorization");
-        if(token == null) return false;
+        if(token == null) {
+            log.debug("token is null，认证失败");
+            return false;
+        }
         // 取出id
         try {
             // 校验jwt

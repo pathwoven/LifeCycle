@@ -3,13 +3,13 @@ package com.cc.controller;
 
 import com.cc.dto.LoginFormDTO;
 import com.cc.dto.Result;
-import com.cc.dto.UserDTO;
+import com.cc.dto.UserRegisterDto;
 import com.cc.entity.User;
 import com.cc.entity.UserInfo;
 import com.cc.properties.JwtProperties;
 import com.cc.service.IUserInfoService;
 import com.cc.service.IUserService;
-import com.cc.vo.UserLoginVO;
+import com.cc.vo.LoginVO;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
@@ -67,11 +67,23 @@ public class UserController {
                 .signWith(SignatureAlgorithm.HS256, jwtProperties.getSecretKey())
                 .setClaims(claims).compact();
 
-        UserLoginVO userLoginVO = new UserLoginVO();
-        BeanUtils.copyProperties(user,userLoginVO);
-        userLoginVO.setToken(token);
+        LoginVO loginVO = new LoginVO();
+        BeanUtils.copyProperties(user, loginVO);
+        loginVO.setToken(token);
 
-        return Result.ok(userLoginVO);
+        return Result.ok(loginVO);
+    }
+
+    /**
+     * 注册
+     */
+    @PostMapping("/register")
+    public Result register(@RequestBody UserRegisterDto userRegisterDto){
+        boolean success = userService.register(userRegisterDto);
+        if(!success){
+            return Result.fail("注册失败");
+        }
+        return Result.ok();
     }
 
     /**
