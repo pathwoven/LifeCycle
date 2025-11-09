@@ -2,6 +2,9 @@ package com.cc.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cc.constant.RedisConstants;
+import com.cc.constant.UserActiveConstant;
+import com.cc.constant.UserInfluencerConstants;
+import com.cc.dto.BlogPublishDTO;
 import com.cc.dto.FeedPushMessage;
 import com.cc.dto.UserDTO;
 import com.cc.entity.Blog;
@@ -36,16 +39,27 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IB
     private FeedPushProducer feedPushProducer;
 
     @Override
-    public Long publishBlog(Blog blog) {
+    public Long publishBlog(BlogPublishDTO blogPublishDTO) {
+        Blog blog = new Blog();
+        BeanUtils.copyProperties(blogPublishDTO,blog);
+        blog.setUserId(UserHolder.getUserId());
+
         // 保存探店博文
         boolean isSuccess = save(blog);
         if(!isSuccess) return null;
 
         // feed流处理
+        // 判断影响力，确认是否要推送
+        Double influence = stringRedisTemplate.opsForZSet()
+                .score(RedisConstants.USER_INFLUENCE_KEY, blog.getUserId().toString());
+        if(influence != null && influence > UserInfluencerConstants.INFLUENCER_THRESHOLD) {
+            // 拉取模式，直接返回
+            return blog.getId();
+        }
+
+        // 推送模式
         // 设置是否异步的阈值
         int asyncThreshold = 100;
-        // 设置是否推拉的阈值
-        int pullThreshold = 1000;
         // 判断粉丝数
         Long followerCount = userInfoService.queryFollowerCount(blog.getUserId());
         if(followerCount == 0) return blog.getId();
@@ -55,16 +69,19 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IB
             List<Long> fansIds = followService.queryFansIds(blog.getUserId());
             // 推送博文id到粉丝的收件箱
             for(Long fanId: fansIds){
-                String key = RedisConstants.FEED_KEY + fanId;
+                // 判断是否是活跃用户
+                Double score = stringRedisTemplate.opsForZSet()
+                        .score(RedisConstants.USER_ACTIVE_KEY,fanId.toString());
+                if(score == null || score < UserActiveConstant.ACTIVE_THRESHOLD) continue;
+                String key = RedisConstants.FEED_BOX_KEY + fanId;
                 stringRedisTemplate.opsForZSet()
                         .add(key, blog.getId().toString(), System.currentTimeMillis());
+                // todo 超过一定数量后，移除最早的消息
             }
-        }else if(followerCount <= pullThreshold){
+        }else{
             // 粉丝数较多，使用异步推送模式
             FeedPushMessage msg = new FeedPushMessage(blog.getUserId(), blog.getId());
             feedPushProducer.sendPushMessage(msg);
-        }else{
-            // 粉丝数极多，使用拉取模式，无需推送 todo
         }
         return blog.getId();
     }

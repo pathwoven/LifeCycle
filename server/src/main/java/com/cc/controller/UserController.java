@@ -1,6 +1,8 @@
 package com.cc.controller;
 
 
+import com.cc.constant.RedisConstants;
+import com.cc.constant.UserActiveConstant;
 import com.cc.dto.LoginFormDTO;
 import com.cc.dto.Result;
 import com.cc.dto.UserRegisterDto;
@@ -17,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.config.types.Password;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,6 +42,9 @@ public class UserController {
 
     @Autowired
     private JwtProperties jwtProperties;
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
+
     /**
      * 发送手机验证码
      */
@@ -71,6 +77,11 @@ public class UserController {
         LoginVO loginVO = new LoginVO();
         BeanUtils.copyProperties(user, loginVO);
         loginVO.setToken(token);
+
+        // 增加活跃度
+        stringRedisTemplate.opsForZSet().incrementScore(RedisConstants.USER_ACTIVE_KEY,
+                user.getId().toString(),
+                UserActiveConstant.LOGIN_ADD);
 
         return Result.ok(loginVO);
     }

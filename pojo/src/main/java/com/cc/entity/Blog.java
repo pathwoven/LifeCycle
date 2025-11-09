@@ -1,7 +1,6 @@
 package com.cc.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -32,22 +31,6 @@ public class Blog implements Serializable {
      * 用户id
      */
     private Long userId;
-    /**
-     * 用户图标
-     */
-    @TableField(exist = false)
-    private String icon;
-    /**
-     * 用户姓名
-     */
-    @TableField(exist = false)
-    private String name;
-    /**
-     * 是否点赞过了
-     */
-    @TableField(exist = false)
-    private Boolean isLike;
-
     /**
      * 标题
      */
@@ -82,6 +65,4 @@ public class Blog implements Serializable {
      * 更新时间
      */
     private LocalDateTime updateTime;
-
-
 }

@@ -5,6 +5,8 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cc.constant.RedisConstants;
+import com.cc.dto.Result;
+import com.cc.dto.ShopNearDTO;
 import com.cc.entity.Shop;
 import com.cc.mapper.ShopMapper;
 import com.cc.service.IShopService;
@@ -92,4 +94,5 @@ public class ShopServiceImpl extends ServiceImpl<ShopMapper, Shop> implements IS
 
         return null;
     }
+
 }

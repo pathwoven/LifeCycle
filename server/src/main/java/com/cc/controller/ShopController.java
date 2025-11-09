@@ -7,10 +7,12 @@ import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cc.constant.RedisConstants;
 import com.cc.dto.Result;
+import com.cc.dto.ShopNearDTO;
 import com.cc.entity.Shop;
 import com.cc.service.IShopService;
 import com.cc.constant.SystemConstants;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.geo.Point;
 import org.springframework.data.redis.connection.RedisConfiguration;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
@@ -48,6 +50,12 @@ public class ShopController {
     public Result saveShop(@RequestBody Shop shop) {
         // 写入数据库
         shopService.save(shop);
+        // 写入geo缓存 todo 过期时间
+        stringRedisTemplate.opsForGeo().add(
+                RedisConstants.SHOP_GEO_KEY + shop.getTypeId().toString(),
+                new Point(shop.getX(), shop.getY()),
+                shop.getId().toString()
+        );
         // 返回店铺id
         return Result.ok(shop.getId());
     }
@@ -65,6 +73,7 @@ public class ShopController {
         shopService.updateById(shop);
         // 删除缓存
         stringRedisTemplate.delete(RedisConstants.CACHE_SHOP_KEY+shop.getId());
+        // todo 如果更新了坐标，还要更新geo缓存
         return Result.ok();
     }
 
@@ -104,5 +113,16 @@ public class ShopController {
                 .page(new Page<>(current, SystemConstants.MAX_PAGE_SIZE));
         // 返回数据
         return Result.ok(page.getRecords());
+    }
+
+    /**
+     * 根据经纬度分页查询商铺信息
+     * @return 商铺列表
+     */
+    @GetMapping("/of/geo")
+    public Result queryShopByGeo(@RequestBody ShopNearDTO shopNearDTO) {
+        return Result.fail("功能未完成");
+//        stringRedisTemplate.opsForGeo().search(RedisConstants.SHOP_GEO_KEY+shopNearDTO.getTypeId().toString(),
+//                )
     }
 }

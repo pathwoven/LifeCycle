@@ -2,6 +2,7 @@ package com.cc.controller;
 
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.cc.dto.BlogPublishDTO;
 import com.cc.dto.Result;
 import com.cc.dto.UserDTO;
 import com.cc.entity.Blog;
@@ -26,11 +27,15 @@ public class BlogController {
     @Resource
     private IUserService userService;
 
-    @PostMapping
-    public Result saveBlog(@RequestBody Blog blog) {
-        blog.setUserId(UserHolder.getUserId());
+    /**
+     * 发布探店博文
+     * @param blogPublishDTO
+     * @return
+     */
+    @PostMapping("/publish")
+    public Result publishBlog(@RequestBody BlogPublishDTO blogPublishDTO) {
         // 保存探店博文
-        Long id = blogService.publishBlog(blog);
+        Long id = blogService.publishBlog(blogPublishDTO);
         // 返回id
         return Result.ok(id);
     }

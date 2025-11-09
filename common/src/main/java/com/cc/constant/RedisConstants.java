@@ -21,10 +21,20 @@ public class RedisConstants {
     public static final String SECKILL_USER_KEY = "seckill:user:";
     public static final String SECKILL_ORDER_KEY = "seckill:order:";
     public static final String BLOG_LIKED_KEY = "blog:liked:";
-    public static final String FEED_KEY = "feed:";
     public static final String SHOP_GEO_KEY = "shop:geo:";
+    public static final Integer SHOP_GEO_PAGE_SIZE = 20;
     public static final String USER_SIGN_KEY = "sign:";
 
     // feed相关
     public static final String FEED_BOX_KEY = "feed:box:";
+    public static final Long FEED_BOX_TTL_DAYS = 7L;
+
+    // 影响力
+    public static final String USER_INFLUENCE_KEY = "user:influence"; // zset 用户影响力
+
+    // 活跃度相关
+    public static final String USER_ACTIVE_KEY = "user:active";   // zset 用户活跃度
+    public static final Integer USER_ACTIVE_MAX = 2000;    // zset 最大存储数
+
+    public static final String USER_FOLLOW_KEY = "user:follow:"; // set 用户关注列表
 }
