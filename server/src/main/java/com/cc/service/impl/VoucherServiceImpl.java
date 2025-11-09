@@ -55,8 +55,9 @@ public class VoucherServiceImpl extends ServiceImpl<VoucherMapper, Voucher> impl
         BeanUtils.copyProperties(voucherAddSeckillDTO, seckillVoucher);
         seckillVoucher.setVoucherId(id);
         seckillVoucherService.save(seckillVoucher);
+        // 判断是否是今天的秒杀，如果不是今天的，不用预热缓存
+        if(!seckillVoucher.getBeginKillTime().toLocalDate().equals(LocalDate.now())) return id;
         // 如果时间是今天的，要预热缓存
-        if(seckillVoucher.getBeginKillTime().toLocalDate().equals(LocalDate.now())) return id;
         // 预热缓存
         String key = RedisConstants.SECKILL_STOCK_KEY + seckillVoucher.getVoucherId();
         // stringRedisTemplate.opsForValue().set(key, String.valueOf(seckillVoucher.getStock()));
@@ -69,6 +70,7 @@ public class VoucherServiceImpl extends ServiceImpl<VoucherMapper, Voucher> impl
     @Override
     public List<SeckillVoucherCacheDTO> querySeckillVoucherForCacheToday() {
         List<Long> voucherIdList = voucherMapper.querySeckillVoucherForCacheToday();
+        if(voucherIdList == null || voucherIdList.isEmpty()) return new ArrayList<>();
         return seckillVoucherMapper.querySeckillVoucherForCacheToday(voucherIdList);
     }
 }

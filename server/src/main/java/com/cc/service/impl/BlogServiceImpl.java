@@ -2,11 +2,15 @@ package com.cc.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cc.constant.RedisConstants;
+import com.cc.dto.FeedPushMessage;
 import com.cc.dto.UserDTO;
 import com.cc.entity.Blog;
 import com.cc.entity.User;
 import com.cc.mapper.BlogMapper;
+import com.cc.mq.FeedPushProducer;
 import com.cc.service.IBlogService;
+import com.cc.service.IFollowService;
+import com.cc.service.IUserInfoService;
 import com.cc.service.IUserService;
 import com.cc.utils.UserHolder;
 import org.springframework.beans.BeanUtils;
@@ -24,6 +28,47 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IB
     private StringRedisTemplate stringRedisTemplate;
     @Autowired
     private IUserService userService;
+    @Autowired
+    private IUserInfoService userInfoService;
+    @Autowired
+    private IFollowService followService;
+    @Autowired
+    private FeedPushProducer feedPushProducer;
+
+    @Override
+    public Long publishBlog(Blog blog) {
+        // 保存探店博文
+        boolean isSuccess = save(blog);
+        if(!isSuccess) return null;
+
+        // feed流处理
+        // 设置是否异步的阈值
+        int asyncThreshold = 100;
+        // 设置是否推拉的阈值
+        int pullThreshold = 1000;
+        // 判断粉丝数
+        Long followerCount = userInfoService.queryFollowerCount(blog.getUserId());
+        if(followerCount == 0) return blog.getId();
+        // 粉丝数较少，使用同步推送模式
+        if(followerCount <= asyncThreshold){
+            // 查询粉丝
+            List<Long> fansIds = followService.queryFansIds(blog.getUserId());
+            // 推送博文id到粉丝的收件箱
+            for(Long fanId: fansIds){
+                String key = RedisConstants.FEED_KEY + fanId;
+                stringRedisTemplate.opsForZSet()
+                        .add(key, blog.getId().toString(), System.currentTimeMillis());
+            }
+        }else if(followerCount <= pullThreshold){
+            // 粉丝数较多，使用异步推送模式
+            FeedPushMessage msg = new FeedPushMessage(blog.getUserId(), blog.getId());
+            feedPushProducer.sendPushMessage(msg);
+        }else{
+            // 粉丝数极多，使用拉取模式，无需推送 todo
+        }
+        return blog.getId();
+    }
+
     // 返回isLiked，操作后是否已点赞
     @Override
     public Boolean likeBlog(Long id) {

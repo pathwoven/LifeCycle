@@ -14,8 +14,6 @@ public class VoucherAddSeckillDTO {
     private Long actualValue;
     private Integer type;
     private Integer status;
-    private LocalDateTime createTime;
-    private LocalDateTime updateTime;
     private Integer stock;
     private LocalDateTime beginTime;
     private LocalDateTime endTime;

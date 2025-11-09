@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cc.dto.UserRegisterDto;
 import com.cc.entity.User;
+import com.cc.entity.UserInfo;
+import com.cc.mapper.UserInfoMapper;
 import com.cc.mapper.UserMapper;
 import com.cc.service.IUserService;
 import com.cc.utils.PasswordEncoder;
@@ -20,6 +22,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     @Autowired
     private UserMapper userMapper;
+    @Autowired UserInfoMapper userInfoMapper;
 
     @Override
     public User loginByPhone(String phone) {
@@ -41,6 +44,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         user.setUpdateTime(now);
         user.setPassword(PasswordEncoder.encode(user.getPassword()));
         save(user);
+
+        // 创建用户信息
+        UserInfo userInfo = new UserInfo();
+        userInfo.setUserId(user.getId());
+        userInfo.setCreateTime(now);
+        userInfo.setUpdateTime(now);
+        userInfoMapper.insert(userInfo);
         return true;
     }
 

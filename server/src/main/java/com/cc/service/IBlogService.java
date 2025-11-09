@@ -7,6 +7,7 @@ import com.cc.entity.Blog;
 import java.util.List;
 
 public interface IBlogService extends IService<Blog> {
+    Long publishBlog(Blog blog);
     Boolean likeBlog(Long id);
     List<UserDTO> queryBlogLikesTop5(Long id);
 }

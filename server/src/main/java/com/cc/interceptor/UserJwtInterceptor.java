@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 
 @Component
 @Slf4j
-public class JwtInterceptor implements HandlerInterceptor {
+public class UserJwtInterceptor implements HandlerInterceptor {
     @Autowired
     JwtProperties jwtProperties;
     @Override

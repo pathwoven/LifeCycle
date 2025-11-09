@@ -9,10 +9,12 @@ import com.cc.entity.UserInfo;
 import com.cc.properties.JwtProperties;
 import com.cc.service.IUserInfoService;
 import com.cc.service.IUserService;
+import com.cc.utils.PasswordEncoder;
 import com.cc.vo.LoginVO;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.common.config.types.Password;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.DigestUtils;
@@ -55,8 +57,7 @@ public class UserController {
         User user = userService.loginByPhone(loginForm.getPhone());
         if(user == null){ return Result.fail("手机或密码错误");}
         // 验证密码
-        String password = DigestUtils.md5DigestAsHex(loginForm.getPassword().getBytes());
-        if(!password.equals(user.getPassword())) return Result.fail("手机或密码错误");
+        if(!PasswordEncoder.matches(user.getPassword(), loginForm.getPassword())) return Result.fail("手机或密码错误");
 
         Date exp = new Date(System.currentTimeMillis() + jwtProperties.getTtl());
         Map<String, Object> claims = new HashMap<>();

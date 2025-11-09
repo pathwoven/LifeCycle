@@ -24,6 +24,7 @@ public class CacheService implements ICacheService {
 
     public void warmUpSeckill(){
         List<SeckillVoucherCacheDTO> cacheDTOList = voucherService.querySeckillVoucherForCacheToday();
+        if(cacheDTOList == null || cacheDTOList.isEmpty()){return;}
         for(SeckillVoucherCacheDTO cacheDTO : cacheDTOList){
             String key = RedisConstants.SECKILL_STOCK_KEY + cacheDTO.getVoucherId();
             // stringRedisTemplate.opsForValue().set(key, String.valueOf(seckillVoucher.getStock()));

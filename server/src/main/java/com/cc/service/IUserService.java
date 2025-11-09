@@ -9,4 +9,5 @@ public interface IUserService extends IService<User> {
     User loginByPhone(String phone);
 
     boolean register(UserRegisterDto userRegisterDto);
+
 }

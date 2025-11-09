@@ -5,4 +5,5 @@ import com.cc.entity.UserInfo;
 
 public interface IUserInfoService extends IService<UserInfo> {
 
+    Long queryFollowerCount(Long userId);
 }

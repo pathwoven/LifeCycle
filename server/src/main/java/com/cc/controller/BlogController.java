@@ -30,9 +30,9 @@ public class BlogController {
     public Result saveBlog(@RequestBody Blog blog) {
         blog.setUserId(UserHolder.getUserId());
         // 保存探店博文
-        blogService.save(blog);
+        Long id = blogService.publishBlog(blog);
         // 返回id
-        return Result.ok(blog.getId());
+        return Result.ok(id);
     }
 
     @PutMapping("/like/{id}")
@@ -49,14 +49,12 @@ public class BlogController {
 
     @GetMapping("/of/me")
     public Result queryMyBlog(@RequestParam(value = "current", defaultValue = "1") Integer current) {
-        log.info("debug:收到请求");
-        return Result.fail("功能未实现");
-//        // 根据用户查询
-//        Page<Blog> page = blogService.query()
-//                .eq("user_id", UserHolder.getUserId()).page(new Page<>(current, SystemConstants.MAX_PAGE_SIZE));
-//        // 获取当前页数据
-//        List<Blog> records = page.getRecords();
-//        return Result.ok(records);
+        // 根据用户查询
+        Page<Blog> page = blogService.query()
+                .eq("user_id", UserHolder.getUserId()).page(new Page<>(current, SystemConstants.MAX_PAGE_SIZE));
+        // 获取当前页数据
+        List<Blog> records = page.getRecords();
+        return Result.ok(records);
     }
 
     @GetMapping("/hot")
@@ -75,5 +73,10 @@ public class BlogController {
             blog.setIcon(user.getIcon());
         });
         return Result.ok(records);
+    }
+
+    @GetMapping("/feed")
+    public Result queryFeedBlog(){
+        return Result.fail("功能未实现");
     }
 }
