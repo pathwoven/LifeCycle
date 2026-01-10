@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.beans.beancontext.BeanContext;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class VoucherOrderServiceImpl extends ServiceImpl<VoucherOrderMapper, VoucherOrder> implements IVoucherOrderService {
@@ -50,6 +51,7 @@ public class VoucherOrderServiceImpl extends ServiceImpl<VoucherOrderMapper, Vou
         SECKILL_CANCEL_SCRIPT.setResultType(Long.class);
         SECKILL_CANCEL_SCRIPT.setLocation(new ClassPathResource("seckillCancel.lua"));
     }
+
     @Override
     public Long seckillVoucher(Long userId, Long voucherId) {
         String stockKey = RedisConstants.SECKILL_STOCK_KEY+voucherId;
@@ -65,23 +67,27 @@ public class VoucherOrderServiceImpl extends ServiceImpl<VoucherOrderMapper, Vou
                 Arrays.asList(userKey, stockKey), userId, "stock");
         if(result == 0) return null;
         // 下单成功
-        // 修改数据库
-        boolean success = seckillVoucherService.update()
-                .eq("voucher_id", voucherId)
-                .gt("stock", 0)
-                .setSql("stock = stock - 1")
-                .update();
-        if(!success) {
-            log.error("缓存扣减成功，但数据库库存不足");
-            return null;
-        }
+//        // 修改数据库
+//        boolean success = seckillVoucherService.update()
+//                .eq("voucher_id", voucherId)
+//                .gt("stock", 0)
+//                .setSql("stock = stock - 1")
+//                .update();
+//        if(!success) {
+//            log.error("缓存扣减成功，但数据库库存不足");
+//            return null;
+//        }
         // 生成订单id
         long orderId = redisIDWorker.nextId(RedisConstants.SECKILL_ORDER_KEY+voucherId);
         // 异步生成订单
         SeckillOrderMessage seckillOrderMessage = new SeckillOrderMessage(
                 orderId, voucherId, userId
         );
+        // todo 同步改异步，并增加本地补偿表
         rocketMQTemplate.syncSend(MqConstants.SECKILL_ORDER_TOPIC, seckillOrderMessage);
+
+        stringRedisTemplate.opsForValue()
+                .set(RedisConstants.VOUCHER_ORDER_STATUS_KEY+orderId, "0", RedisConstants.SECKILL_ORDER_TTL_MIN, TimeUnit.MINUTES);
         return orderId;
     }
 
@@ -129,5 +135,32 @@ public class VoucherOrderServiceImpl extends ServiceImpl<VoucherOrderMapper, Vou
             throw new RuntimeException("订单取消错误!!");
         }
         return true;
+    }
+
+    /**
+     * 在redis中获取支付链接，假如没有，则获取锁、生成并写入redis
+     * @param orderId
+     * @param type
+     * @return
+     */
+    @Override
+    public String getPayLink(Long orderId, Integer type) {
+        return "";
+    }
+
+    /**
+     * 获取订单的状态
+     * @param orderId
+     * @return
+     */
+    @Override
+    public Integer getStatus(Long orderId) {
+        // 先redis中查询
+        String s = stringRedisTemplate.opsForValue().get(RedisConstants.VOUCHER_ORDER_STATUS_KEY + orderId);
+        if(s != null){
+            return Integer.valueOf(s);
+        }
+        // 数据库中查询
+        return voucherOrderMapper.queryStatus(orderId);
     }
 }

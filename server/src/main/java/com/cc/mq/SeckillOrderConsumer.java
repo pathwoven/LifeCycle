@@ -1,34 +1,47 @@
 package com.cc.mq;
 
 import com.cc.constant.MqConstants;
+import com.cc.constant.RedisConstants;
 import com.cc.dto.SeckillOrderMessage;
 import com.cc.entity.VoucherOrder;
+import com.cc.mapper.SeckillVoucherMapper;
+import com.cc.service.ISeckillVoucherService;
 import com.cc.service.IVoucherOrderService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.client.producer.SendCallback;
 import org.apache.rocketmq.client.producer.SendResult;
 import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
 import org.apache.rocketmq.spring.core.RocketMQListener;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.concurrent.TimeUnit;
 
 @Service
+@Slf4j
 @RocketMQMessageListener(topic = MqConstants.SECKILL_ORDER_TOPIC, consumerGroup =  MqConstants.SECKILL_ORDER_GROUP)
 public class SeckillOrderConsumer implements RocketMQListener<SeckillOrderMessage> {
     @Autowired
-    IVoucherOrderService voucherOrderService;
+    private IVoucherOrderService voucherOrderService;
     @Autowired
-    RocketMQTemplate rocketMQTemplate;
-    @Override
-    public void onMessage(SeckillOrderMessage msg) {
-        // 幂等性检查
-        if(voucherOrderService.getById(msg.getSeckillOrderId()) != null){return;}
+    private RocketMQTemplate rocketMQTemplate;
+    @Autowired
+    private ISeckillVoucherService seckillVoucherService;
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
 
+    @Override
+    @Transactional
+    // 利用数据库天然幂等性实现分布式排他
+    public void onMessage(SeckillOrderMessage msg) {
         // 生成订单
         VoucherOrder voucherOrder = new VoucherOrder();
         voucherOrder.setId(msg.getSeckillOrderId());
@@ -38,7 +51,36 @@ public class SeckillOrderConsumer implements RocketMQListener<SeckillOrderMessag
         voucherOrder.setVoucherId(msg.getVoucherId());
         voucherOrder.setStatus(1);
 
-        voucherOrderService.save(voucherOrder);
+        // 幂等性检查 （由于id不可重复，所以假如插入失败，说明已经存在该订单）
+        try {
+            boolean success = voucherOrderService.save(voucherOrder);
+            if (!success) {
+                log.warn("订单已存在，无需重复下单, orderId={}", msg.getSeckillOrderId());
+                return; // 幂等返回
+            }
+        } catch (DuplicateKeyException e) {
+            // note: 记得要捕获异常！防止mq以为消费失败而重试消费
+            log.info("订单已存在（DuplicateKey），orderId={}", msg.getSeckillOrderId());
+            return;
+        }
+
+        // 应该只有唯一的那个插入成功的才能进来，所以应该不用加锁
+
+        // 扣减库存
+        boolean success = seckillVoucherService.update()
+                .setSql("stock = stock - 1")
+                .eq("voucher_id", msg.getVoucherId())
+                .gt("stock", 0)
+                .update();
+        if(!success){
+            stringRedisTemplate.opsForValue().set(RedisConstants.VOUCHER_ORDER_STATUS_KEY+msg.getSeckillOrderId(),
+                    "-1", RedisConstants.SECKILL_ORDER_TTL_MIN, TimeUnit.MINUTES);
+            log.warn("库存不足，秒杀失败，orderId={}", msg.getSeckillOrderId());
+            return;
+        }
+        stringRedisTemplate.opsForValue().set(RedisConstants.VOUCHER_ORDER_STATUS_KEY+msg.getSeckillOrderId(),
+                "1", RedisConstants.SECKILL_ORDER_TTL_MIN, TimeUnit.MINUTES);
+
 
         // 发送延时消息以便超时取消
 //        rocketMQTemplate.asyncSend(

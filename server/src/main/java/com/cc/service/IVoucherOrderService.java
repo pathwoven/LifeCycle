@@ -8,4 +8,8 @@ public interface IVoucherOrderService extends IService<VoucherOrder> {
 
     void checkPayment(Long userId, Long voucherId, Long orderId);
     boolean cancelOrder(Long userId, Long voucherId, Long orderId);
+
+    String getPayLink(Long orderId, Integer type);
+
+    Integer getStatus(Long orderId);
 }

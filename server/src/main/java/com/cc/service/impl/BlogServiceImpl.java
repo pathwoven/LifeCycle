@@ -37,6 +37,8 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IB
     private IFollowService followService;
     @Autowired
     private FeedPushProducer feedPushProducer;
+    @Autowired
+    private BlogMapper blogMapper;
 
     @Override
     public Long publishBlog(BlogPublishDTO blogPublishDTO) {
@@ -53,7 +55,15 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IB
         Double influence = stringRedisTemplate.opsForZSet()
                 .score(RedisConstants.USER_INFLUENCE_KEY, blog.getUserId().toString());
         if(influence != null && influence > UserInfluencerConstants.INFLUENCER_THRESHOLD) {
-            // 拉取模式，直接返回
+            // 拉取模式，维护博文列表
+            stringRedisTemplate.opsForList()
+                    .rightPush(RedisConstants.FEED_AUTHOR_KEY+blog.getUserId(), blog.getId().toString());
+            Long size = stringRedisTemplate.opsForList()
+                    .size(RedisConstants.FEED_AUTHOR_KEY+blog.getUserId());
+            if(size != null && size > RedisConstants.FEED_AUTHOR_LIST_MAX) {
+                stringRedisTemplate.opsForList()
+                        .leftPop(RedisConstants.FEED_AUTHOR_KEY+blog.getUserId());
+            }
             return blog.getId();
         }
 
@@ -124,5 +134,18 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IB
             userDTOS.add(userDTO);
         }
         return userDTOS;
+    }
+
+    @Override
+    public List<Blog> queryBlogsByTimeline(Long max, Integer offset) {
+        return blogMapper.queryBlogsByTimeline(
+                max,
+                offset
+        );
+    }
+
+    @Override
+    public List<Blog> queryBlogsByBlogId(List<Long> blogIds) {
+        return blogMapper.queryBlogsByBlogId(blogIds);
     }
 }
