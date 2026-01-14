@@ -14,17 +14,21 @@ public class RedisConstants {
     public static final String LOCK_SHOP_KEY = "lock:shop:";
     public static final String LOCK_PREFIX_KEY = "lock:";
     public static final Long LOCK_TTL_SECOND = 10L;
+    public static final String LOCK_PAY_KEY = "lock:pay:";   // lock:pay:{orderId}:{type}
+    public static final String LOCK_PAY_CALLBACK_KEY = "lock:pay:callback:"; // lock:pay:callback:{outTradeNo}
 
     public static final String ID_INCREMENT_KEY = "icr:";
 
     public static final String SECKILL_STOCK_KEY = "seckill:stock:";
     public static final String SECKILL_USER_KEY = "seckill:user:";
-    public static final String SECKILL_ORDER_KEY = "seckill:order:";
 
-    // 0 正在生成订单, 1 待支付，2 支付完成 3 已核销 4 已取消 5 退款中；6 已退款 -1 库存不足 / 秒杀失败
-    // 0->1,-1   1->2,4    2->4（订单生成时不可取消）
-    public static final String VOUCHER_ORDER_STATUS_KEY = "voucher-order:status:";
+    // 0 正在生成订单； 1：未支付；2：已支付；3：已取消；4：退款中；5：已退款 6：已核销； -1 库存不足 / 秒杀失败
+    // 0->1,-1   1->2,3    2->4->5（订单生成时不可取消）
+    public static final String ORDER_STATUS_KEY = "order:status:";
     public static final Long SECKILL_ORDER_TTL_MIN = 15L;
+    // 记录支付链接 格式： pay:link:{orderId}:{type} -> link
+    public static final String PAY_LINK_KEY = "pay:link:";
+    public static final Long PAY_LINK_TTL_MIN = 15L;
 
     public static final String BLOG_LIKED_KEY = "blog:liked:";
     public static final String BLOG_HOT_CITY_KEY = "blog:hot:";   // zset 博客热门城市排行榜
@@ -51,4 +55,8 @@ public class RedisConstants {
     public static final Integer USER_ACTIVE_MAX = 2000;    // zset 最大存储数
 
     public static final String USER_FOLLOW_KEY = "user:follow:"; // set 用户关注列表
+
+    // 生成分布式id
+    public static final String ID_ORDER_KEY = "id:order";
+    public static final String ID_OUT_TRADE_KEY = "id:out_trade";
 }

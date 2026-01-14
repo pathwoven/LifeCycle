@@ -3,6 +3,8 @@ package com.cc.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.cc.entity.VoucherOrder;
 
+import java.util.Map;
+
 public interface IVoucherOrderService extends IService<VoucherOrder> {
     Long seckillVoucher(Long userId, Long voucherId);
 
@@ -12,4 +14,6 @@ public interface IVoucherOrderService extends IService<VoucherOrder> {
     String getPayLink(Long orderId, Integer type);
 
     Integer getStatus(Long orderId);
+
+    boolean alipayPayCallback(Map<String, String> params);
 }

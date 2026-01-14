@@ -33,3 +33,6 @@ build/
 .vscode/
 
 /server/src/main/resources/nginx-1.18.0/
+
+*-dev.yaml
+

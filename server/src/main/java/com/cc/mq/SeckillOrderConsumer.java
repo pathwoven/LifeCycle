@@ -4,20 +4,15 @@ import com.cc.constant.MqConstants;
 import com.cc.constant.RedisConstants;
 import com.cc.dto.SeckillOrderMessage;
 import com.cc.entity.VoucherOrder;
-import com.cc.mapper.SeckillVoucherMapper;
 import com.cc.service.ISeckillVoucherService;
 import com.cc.service.IVoucherOrderService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.rocketmq.client.producer.SendCallback;
-import org.apache.rocketmq.client.producer.SendResult;
 import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
 import org.apache.rocketmq.spring.core.RocketMQListener;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.messaging.Message;
-import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -73,12 +68,12 @@ public class SeckillOrderConsumer implements RocketMQListener<SeckillOrderMessag
                 .gt("stock", 0)
                 .update();
         if(!success){
-            stringRedisTemplate.opsForValue().set(RedisConstants.VOUCHER_ORDER_STATUS_KEY+msg.getSeckillOrderId(),
+            stringRedisTemplate.opsForValue().set(RedisConstants.ORDER_STATUS_KEY +msg.getSeckillOrderId(),
                     "-1", RedisConstants.SECKILL_ORDER_TTL_MIN, TimeUnit.MINUTES);
             log.warn("库存不足，秒杀失败，orderId={}", msg.getSeckillOrderId());
             return;
         }
-        stringRedisTemplate.opsForValue().set(RedisConstants.VOUCHER_ORDER_STATUS_KEY+msg.getSeckillOrderId(),
+        stringRedisTemplate.opsForValue().set(RedisConstants.ORDER_STATUS_KEY +msg.getSeckillOrderId(),
                 "1", RedisConstants.SECKILL_ORDER_TTL_MIN, TimeUnit.MINUTES);
 
 

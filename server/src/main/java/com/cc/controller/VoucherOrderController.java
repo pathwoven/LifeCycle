@@ -1,6 +1,7 @@
 package com.cc.controller;
 
 
+import com.alipay.api.internal.util.AlipaySignature;
 import com.cc.constant.RedisConstants;
 import com.cc.dto.Result;
 import com.cc.entity.VoucherOrder;
@@ -10,6 +11,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/voucher-order")
@@ -67,38 +72,4 @@ public class VoucherOrderController {
         }
     }
 
-    /**
-     * 长轮询订单的支付状态
-     * @param orderId
-     * @return ok(status)，fail表示订单异常
-     */
-    @GetMapping("/pay/status/{id}")
-    public Result getPayStatus(@PathVariable("id") Long orderId) {
-        while (true) {
-            Integer status = voucherOrderService.getStatus(orderId);
-            if (status == null) {
-                return Result.fail("订单异常");
-            }
-            // 支付完成
-            if (status != 1) {
-                return Result.ok(status);
-            }
-            // 继续等待
-            try {
-                Thread.sleep(200); // 每 200ms 检查一次
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                return Result.fail("线程被中断");
-            }
-        }
-    }
-
-    @GetMapping("/pay/{id}/{type}")
-    public Result getPayLink(@PathVariable("id") Long orderId, @PathVariable("type") Integer type) {
-        String payLink = voucherOrderService.getPayLink(orderId, type);
-        if(payLink == null) {
-            return Result.fail("获取支付链接失败");
-        }
-        return Result.fail("未实现支付功能");
-    }
 }
