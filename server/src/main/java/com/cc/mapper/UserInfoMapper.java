@@ -6,6 +6,6 @@ import org.apache.ibatis.annotations.Select;
 
 public interface UserInfoMapper extends BaseMapper<UserInfo> {
 
-    @Select("select fans from tb_user_info where user_id = #{userId}")
+    @Select("select fans from user_info where user_id = #{userId}")
     Long queryFollowerCount(Long userId);
 }

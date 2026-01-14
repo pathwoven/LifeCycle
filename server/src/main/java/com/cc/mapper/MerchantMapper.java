@@ -5,6 +5,6 @@ import com.cc.entity.Merchant;
 import org.apache.ibatis.annotations.Select;
 
 public interface MerchantMapper extends BaseMapper<Merchant> {
-    @Select("select * from tb_merchant where phone = #{phone}")
+    @Select("select * from merchant where phone = #{phone}")
     Merchant findByPhone(String phone);
 }

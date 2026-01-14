@@ -6,7 +6,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-@TableName("tb_payment")
+@TableName("payment")
 public class Payment {
     private Long id;
 

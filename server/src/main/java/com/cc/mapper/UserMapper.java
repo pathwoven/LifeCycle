@@ -7,6 +7,6 @@ import org.apache.ibatis.annotations.Select;
 
 @Mapper
 public interface UserMapper extends BaseMapper<User> {
-    @Select("select * from tb_user where phone=#{phone}")
+    @Select("select * from user where phone=#{phone}")
     User findByPhone(String phone);
 }

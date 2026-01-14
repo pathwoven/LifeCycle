@@ -12,6 +12,6 @@ public interface VoucherMapper extends BaseMapper<Voucher> {
 
     List<Voucher> queryVoucherOfShop(@Param("shopId") Long shopId);
 
-    @Select("select id from tb_voucher where type = 1 and status = 1")
+    @Select("select id from voucher where type = 1 and status = 1")
     List<Long> querySeckillVoucherForCacheToday();
 }

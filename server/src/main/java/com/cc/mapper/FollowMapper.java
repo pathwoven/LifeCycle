@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface FollowMapper extends BaseMapper<Follow> {
 
-    @Select("select user_id from tb_follow where follow_user_id = #{userId}")
+    @Select("select user_id from follow where follow_user_id = #{userId}")
     List<Long> queryFansIds(Long userId);
 
 }

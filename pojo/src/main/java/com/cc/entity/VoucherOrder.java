@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName("tb_voucher_order")
+@TableName("voucher_order")
 public class VoucherOrder implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -35,14 +35,17 @@ public class VoucherOrder implements Serializable {
     private Long voucherId;
 
     /**
-     * 支付方式 1：余额支付；2：支付宝；3：微信
+     * 支付方式 0：余额支付；1：支付宝；2：微信
      */
     private Integer payType;
 
+    /**
+     * 付款金额（单位：分）
+     */
     private Long amount;
 
     /**
-     * 订单状态，1：未支付；2：已支付；3：已核销；4：已取消；5：退款中；6：已退款
+     * 订单状态，1：未支付；2：已支付；3：已取消；4：退款中；5：已退款 6：已核销；
      */
     private Integer status;
 
