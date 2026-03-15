@@ -1,0 +1,6 @@
+milvus:
+  uri: "http://localhost:19530"
+  database: milvus_life_cycle.db
+  dimension: 768
+  username: "***"
+  password: "***"

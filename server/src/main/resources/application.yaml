@@ -38,3 +38,10 @@ rocketmq:
   producer:
     group: seckill-producer-group
     send-message-timeout: 3000
+
+milvus:
+  uri: "http://localhost:19530"
+  database: milvus_life_cycle.db
+  dimension: 768
+  username: "***"
+  password: "***"
