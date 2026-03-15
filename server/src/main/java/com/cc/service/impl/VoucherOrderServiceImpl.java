@@ -17,6 +17,7 @@ import com.google.common.collect.Lists;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.ClassPathResource;
@@ -96,7 +97,7 @@ public class VoucherOrderServiceImpl extends ServiceImpl<VoucherOrderMapper, Vou
         long orderId = redisIDWorker.nextId(RedisConstants.ID_ORDER_KEY);
         // 异步生成订单
         SeckillOrderMessage seckillOrderMessage = new SeckillOrderMessage(
-                orderId, voucherId, userId
+                orderId, voucherId, userId, MDC.get("traceId")
         );
         // todo 同步改异步，并增加本地补偿表
         rocketMQTemplate.syncSend(MqConstants.SECKILL_ORDER_TOPIC, seckillOrderMessage);

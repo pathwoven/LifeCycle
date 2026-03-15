@@ -16,6 +16,7 @@ import com.cc.service.IFollowService;
 import com.cc.service.IUserInfoService;
 import com.cc.service.IUserService;
 import com.cc.utils.UserHolder;
+import org.slf4j.MDC;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -90,7 +91,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IB
             }
         }else{
             // 粉丝数较多，使用异步推送模式
-            FeedPushMessage msg = new FeedPushMessage(blog.getUserId(), blog.getId());
+            FeedPushMessage msg = new FeedPushMessage(blog.getUserId(), blog.getId(), MDC.get("traceId"));
             feedPushProducer.sendPushMessage(msg);
         }
         return blog.getId();

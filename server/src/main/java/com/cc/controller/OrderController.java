@@ -1,8 +1,6 @@
 package com.cc.controller;
 
 
-import com.alipay.api.internal.util.AlipaySignature;
-import com.cc.constant.RedisConstants;
 import com.cc.dto.Result;
 import com.cc.entity.VoucherOrder;
 import com.cc.service.IVoucherOrderService;
@@ -12,14 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
-import java.util.Map;
-
 @RestController
-@RequestMapping("/voucher-order")
+@RequestMapping("/order")
 @Slf4j
-public class VoucherOrderController {
+public class OrderController {
     @Autowired
     private IVoucherOrderService voucherOrderService;
     @Autowired

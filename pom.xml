@@ -19,6 +19,7 @@
         <module>pojo</module>
         <module>server</module>
         <module>common</module>
+        <module>ai</module>
     </modules>
 
     <properties>

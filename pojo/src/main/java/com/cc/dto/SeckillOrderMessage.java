@@ -11,4 +11,5 @@ public class SeckillOrderMessage {
     Long seckillOrderId;
     Long userId;
     Long voucherId;
+    String traceId;
 }

@@ -10,4 +10,5 @@ import lombok.NoArgsConstructor;
 public class FeedPushMessage {
     private Long userId;
     private Long blogId;
+    private String traceId;
 }
