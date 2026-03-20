@@ -1,25 +1,28 @@
 package com.cc.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.cc.constant.MqConstants;
 import com.cc.constant.RedisConstants;
 import com.cc.constant.UserActiveConstant;
 import com.cc.constant.UserInfluencerConstants;
 import com.cc.dto.BlogPublishDTO;
-import com.cc.dto.FeedPushMessage;
+import com.cc.dto.mq.BlogPublishMessage;
+import com.cc.dto.mq.FeedPushMessage;
 import com.cc.dto.UserDTO;
 import com.cc.entity.Blog;
 import com.cc.entity.User;
 import com.cc.mapper.BlogMapper;
-import com.cc.mq.FeedPushProducer;
 import com.cc.service.IBlogService;
 import com.cc.service.IFollowService;
 import com.cc.service.IUserInfoService;
 import com.cc.service.IUserService;
 import com.cc.utils.UserHolder;
+import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.slf4j.MDC;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -37,10 +40,15 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IB
     @Autowired
     private IFollowService followService;
     @Autowired
-    private FeedPushProducer feedPushProducer;
+    private RocketMQTemplate rocketMQTemplate;
     @Autowired
     private BlogMapper blogMapper;
 
+    /**
+     * 发布探店博文
+     * @param blogPublishDTO
+     * @return
+     */
     @Override
     public Long publishBlog(BlogPublishDTO blogPublishDTO) {
         Blog blog = new Blog();
@@ -50,6 +58,10 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IB
         // 保存探店博文
         boolean isSuccess = save(blog);
         if(!isSuccess) return null;
+
+        // 发送博文推送成功的消息，使agent响应
+        BlogPublishMessage publishMessage = new BlogPublishMessage(blog.getId(), MDC.get("traceId"));
+        rocketMQTemplate.syncSend(MqConstants.BLOG_PUBLISH_TOPIC, MessageBuilder.withPayload(publishMessage).build());
 
         // feed流处理
         // 判断影响力，确认是否要推送
@@ -92,7 +104,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IB
         }else{
             // 粉丝数较多，使用异步推送模式
             FeedPushMessage msg = new FeedPushMessage(blog.getUserId(), blog.getId(), MDC.get("traceId"));
-            feedPushProducer.sendPushMessage(msg);
+            rocketMQTemplate.syncSend(MqConstants.FEED_PUSH_TOPIC, MessageBuilder.withPayload(msg).build());
         }
         return blog.getId();
     }

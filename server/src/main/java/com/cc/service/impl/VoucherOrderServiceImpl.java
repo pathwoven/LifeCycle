@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cc.constant.MqConstants;
 import com.cc.constant.RedisConstants;
 import com.cc.dto.OrderDTO;
-import com.cc.dto.SeckillOrderMessage;
+import com.cc.dto.mq.SeckillOrderMessage;
 import com.cc.entity.Payment;
 import com.cc.entity.VoucherOrder;
 import com.cc.mapper.VoucherOrderMapper;

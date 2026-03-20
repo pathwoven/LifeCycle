@@ -3,7 +3,7 @@ package com.cc.mq;
 import com.cc.constant.MqConstants;
 import com.cc.constant.RedisConstants;
 import com.cc.constant.UserActiveConstant;
-import com.cc.dto.FeedPushMessage;
+import com.cc.dto.mq.FeedPushMessage;
 import com.cc.service.IFollowService;
 import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
 import org.apache.rocketmq.spring.core.RocketMQListener;

@@ -1,4 +1,4 @@
-package com.cc.service;
+package com.cc.ai.service;
 
 public class AiOrchestratorService {
 }

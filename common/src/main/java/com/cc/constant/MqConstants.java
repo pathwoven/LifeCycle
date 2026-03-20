@@ -10,4 +10,7 @@ public class MqConstants {
 
     public static final String FEED_PUSH_TOPIC = "feed-push";
     public static final String FEED_PUSH_GROUP = "feed-push-group";
+
+    public static final String BLOG_PUBLISH_TOPIC = "blog-publish";
+    public static final String BLOG_PUBLISH_GROUP = "blog-publish-group";
 }

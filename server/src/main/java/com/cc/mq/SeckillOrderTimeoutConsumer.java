@@ -1,7 +1,7 @@
 package com.cc.mq;
 
 import com.cc.constant.MqConstants;
-import com.cc.dto.SeckillOrderMessage;
+import com.cc.dto.mq.SeckillOrderMessage;
 import com.cc.service.IVoucherOrderService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;

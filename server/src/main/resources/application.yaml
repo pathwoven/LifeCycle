@@ -39,6 +39,14 @@ rocketmq:
     group: seckill-producer-group
     send-message-timeout: 3000
 
+langchain4j:
+  open-ai:
+    chat-model:
+      api-key: ${OPENAI_API_KEY}
+      model-name: gpt-4o
+      log-requests: true
+      log-responses: true
+
 milvus:
   uri: "http://localhost:19530"
   database: milvus_life_cycle.db
