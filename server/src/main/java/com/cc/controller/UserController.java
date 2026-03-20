@@ -23,8 +23,6 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpSession;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,7 +35,7 @@ public class UserController {
     @Autowired
     private IUserService userService;
 
-    @Resource
+    @Autowired
     private IUserInfoService userInfoService;
 
     @Autowired
@@ -48,11 +46,11 @@ public class UserController {
     /**
      * 发送手机验证码
      */
-    @PostMapping("code")
-    public Result sendCode(@RequestParam("phone") String phone, HttpSession session) {
-        // TODO 发送短信验证码并保存验证码
-        return Result.fail("功能未完成");
-    }
+//    @PostMapping("code")
+//    public Result sendCode(@RequestParam("phone") String phone, HttpSession session) {
+//        // TODO 发送短信验证码并保存验证码
+//        return Result.fail("功能未完成");
+//    }
 
     /**
      * 登录功能

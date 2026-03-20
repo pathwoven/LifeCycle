@@ -5,15 +5,15 @@ import com.cc.dto.Result;
 import com.cc.dto.VoucherAddSeckillDTO;
 import com.cc.entity.Voucher;
 import com.cc.service.IVoucherService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
 
 @RestController
 @RequestMapping("/voucher")
 public class VoucherController {
 
-    @Resource
+    @Autowired
     private IVoucherService voucherService;
 
     /**

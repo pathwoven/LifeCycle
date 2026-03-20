@@ -10,6 +10,6 @@ import org.springframework.stereotype.Component;
 public class MilvusProperties {
     private String uri;
     private String database;
-    private String username;
-    private String password;
+    private String token;
+    private Long dimension;
 }

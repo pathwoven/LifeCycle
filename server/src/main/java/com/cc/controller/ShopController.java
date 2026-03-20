@@ -17,17 +17,16 @@ import org.springframework.data.redis.connection.RedisConfiguration;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
 import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/shop")
 public class ShopController {
 
-    @Resource
-    public IShopService shopService;
     @Autowired
-    StringRedisTemplate stringRedisTemplate;
+    private IShopService shopService;
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
 
     /**
      * 根据id查询商铺信息

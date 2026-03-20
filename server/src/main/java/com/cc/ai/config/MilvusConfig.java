@@ -19,8 +19,7 @@ public class MilvusConfig {
     public MilvusClientV2 milvusClient(){
         ConnectConfig connectConfig = ConnectConfig.builder()
                 .uri(milvusProperties.getUri())
-                .username(milvusProperties.getUsername())
-                .password(milvusProperties.getPassword())
+                .token(milvusProperties.getToken())
                 .build();
         MilvusClientV2 milvusClient = new MilvusClientV2(connectConfig);
 

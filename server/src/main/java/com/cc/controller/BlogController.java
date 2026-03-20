@@ -12,9 +12,9 @@ import com.cc.service.IUserService;
 import com.cc.constant.SystemConstants;
 import com.cc.utils.UserHolder;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
 import java.util.List;
 
 @RestController
@@ -22,9 +22,9 @@ import java.util.List;
 @Slf4j
 public class BlogController {
 
-    @Resource
+    @Autowired
     private IBlogService blogService;
-    @Resource
+    @Autowired
     private IUserService userService;
 
     /**
