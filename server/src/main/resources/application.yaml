@@ -10,15 +10,16 @@ spring:
     url: "***"
     username: "***"
     password: "***"
-  redis:
-    host: localhost
-    port: 6379
-    lettuce:
-      pool:
-        max-active: 10
-        max-idle: 10
-        min-idle: 1
-        time-between-eviction-runs: 10s
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      lettuce:
+        pool:
+          max-active: 10
+          max-idle: 10
+          min-idle: 1
+          time-between-eviction-runs: 10s
 
   jackson:
     default-property-inclusion: non_null # JSON处理时忽略非空字段
@@ -43,7 +44,12 @@ langchain4j:
   open-ai:
     chat-model:
       api-key: ${OPENAI_API_KEY}
-      model-name: gpt-4o
+      model-name: tongyi-xiaomi-analysis-flash
+      log-requests: true
+      log-responses: true
+    embedding-model:
+      api-key: ${OPENAI_API_KEY}
+      model-name: text-embedding-v1
       log-requests: true
       log-responses: true
 
